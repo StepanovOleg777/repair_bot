@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профессиональный ремонт техники | Мастер на час</title>
+    <meta name="description" content="Ремонт компьютеров, ноутбуков, сборка мебели, установка техники. Быстрый выезд мастера по Таганрогу и области.">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1>Профессиональный ремонт техники и мебели</h1>
+                <p class="header-subtitle">Быстрый выезд мастера · Гарантия качества · Честные цены</p>
+                <div class="header-contacts">
+                    <p>📞 Телефон: <a href="tel:+79991234567">+7 (999) 123-45-67</a></p>
+                    <p>📱 Telegram: <a href="https://t.me/your_username" target="_blank">@master_repair_taganrog</a></p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Services Section -->
+    <section class="services">
+        <div class="container">
+            <h2>Мои услуги</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">💻</div>
+                    <h3>Ремонт компьютеров и ноутбуков</h3>
+                    <ul>
+                        <li>Диагностика и ремонт</li>
+                        <li>Замена комплектующих</li>
+                        <li>Чистка от пыли</li>
+                        <li>Установка Windows и программ</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">🛋️</div>
+                    <h3>Сборка и ремонт мебели</h3>
+                    <ul>
+                        <li>Сборка новой мебели (IKEA, Шатура)</li>
+                        <li>Ремонт и переборка</li>
+                        <li>Установка кухонных гарнитуров</li>
+                        <li>Регулировка фурнитуры</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">🔧</div>
+                    <h3>Установка техники</h3>
+                    <ul>
+                        <li>Стиральные и посудомоечные машины</li>
+                        <li>Кондиционеры и бойлеры</li>
+                        <li>Телевизоры и кронштейны</li>
+                        <li>Встраиваемая техника</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">⚡</div>
+                    <h3>Электромонтажные работы</h3>
+                    <ul>
+                        <li>Установка розеток и выключателей</li>
+                        <li>Монтаж люстр и светильников</li>
+                        <li>Сборка электрощитков</li>
+                        <li>Прокладка кабелей</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Advantages -->
+    <section class="advantages">
+        <div class="container">
+            <h2>Почему выбирают меня</h2>
+            <div class="advantages-grid">
+                <div class="advantage">
+                    <div class="advantage-icon">🚗</div>
+                    <h4>Выезд в день обращения</h4>
+                    <p>Приезжаю в удобное для вас время</p>
+                </div>
+                <div class="advantage">
+                    <div class="advantage-icon">💯</div>
+                    <h4>Гарантия до 1 года</h4>
+                    <p>На все виды работ</p>
+                </div>
+                <div class="advantage">
+                    <div class="advantage-icon">🔧</div>
+                    <h4>Опыт более 5 лет</h4>
+                    <p>Решаю сложные задачи</p>
+                </div>
+                <div class="advantage">
+                    <div class="advantage-icon">💎</div>
+                    <h4>Честные цены</h4>
+                    <p>Без скрытых доплат</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Order Form -->
+    <section class="order-form">
+        <div class="container">
+            <h2>Оставьте заявку</h2>
+            <p>Опишите проблему - я перезвоню в течение 15 минут</p>
+
+            <form id="orderForm">
+                <div class="form-group">
+                    <input type="text" id="name" placeholder="Ваше имя" required>
+                </div>
+                <div class="form-group">
+                    <input type="tel" id="phone" placeholder="Ваш телефон" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="city" placeholder="Город (например, Таганрог)">
+                </div>
+                <div class="form-group">
+                    <select id="serviceType">
+                        <option value="">Выберите тип услуги</option>
+                        <option value="computer">Ремонт компьютера/ноутбука</option>
+                        <option value="furniture">Сборка/ремонт мебели</option>
+                        <option value="appliances">Установка техники</option>
+                        <option value="electrical">Электромонтажные работы</option>
+                        <option value="other">Другое</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <textarea id="problem" placeholder="Опишите вашу проблему или задачу..." rows="4" required></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Отправить заявку</button>
+            </form>
+
+            <div id="formMessage" class="form-message"></div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <h3>Мастер на час</h3>
+                    <p>Качественный ремонт и установка техники в Таганроге</p>
+                </div>
+                <div class="footer-contacts">
+                    <p>📞 <a href="tel:+79991234567">+7 (999) 123-45-67</a></p>
+                    <p>📱 Telegram: <a href="https://t.me/your_username">@master_repair_taganrog</a></p>
+                    <p>📧 Email: <a href="mailto:master@example.com">master@example.com</a></p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Мастер на час. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
