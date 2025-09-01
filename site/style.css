@@ -67,44 +67,98 @@ h2 {
 /* Services */
 .services-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 30px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
     margin-top: 40px;
 }
 
 .service-card {
     background: white;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     text-align: center;
-    transition: transform 0.3s ease;
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .service-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
 }
 
 .service-icon {
-    font-size: 3rem;
-    margin-bottom: 20px;
+    font-size: 2.8rem;
+    margin-bottom: 15px;
 }
 
 .service-card h3 {
-    color: #667eea;
+    color: #2c3e50;
     margin-bottom: 15px;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .service-card ul {
     list-style: none;
     text-align: left;
+    margin-top: auto;
 }
 
 .service-card li {
     margin-bottom: 8px;
-    padding-left: 20px;
+    padding-left: 22px;
     position: relative;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.service-card li:before {
+    content: "•";
+    color: #667eea;
+    position: absolute;
+    left: 8px;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+    .services-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .service-card {
+        padding: 20px;
+    }
+
+    .service-card h3 {
+        font-size: 1.1rem;
+        min-height: auto;
+        margin-bottom: 12px;
+    }
+
+    .service-icon {
+        font-size: 2.5rem;
+        margin-bottom: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .service-card {
+        padding: 15px;
+    }
+
+    .service-card li {
+        font-size: 0.9rem;
+    }
 }
 
 .service-card li:before {
