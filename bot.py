@@ -221,26 +221,30 @@ def handle_admin_actions(update: Update, context: CallbackContext):
     master_id = update.effective_user.id
     master_name = update.effective_user.first_name
 
+    print(f"Обрабатываем callback: {data}")  # Debug
+
     if data == "admin_show_categories":
-        show_category_selection(update, context)
+        return show_category_selection(update, context)
 
     elif data == "admin_refresh":
         query.answer("Статистика обновлена! ✅")
+        return
 
     elif data == "admin_back":
-        show_admin_panel(update, context)
+        return show_admin_panel(update, context)
 
     elif data == "admin_close":
         query.edit_message_text("Панель управления закрыта")
+        return
 
     elif data == "admin_all_orders":
         context.user_data['current_order_index'] = 0
-        show_single_order(update, context, "all")
+        return show_single_order(update, context, "all")
 
     elif data.startswith("admin_category_"):
         category_key = data.split("_")[2]
         context.user_data['current_order_index'] = 0
-        show_single_order(update, context, category_key)
+        return show_single_order(update, context, category_key)
 
     elif data.startswith("take_"):
         active_orders = get_master_active_orders(master_id)
@@ -265,15 +269,16 @@ def handle_admin_actions(update: Update, context: CallbackContext):
                 [InlineKeyboardButton("🔙 К заявкам", callback_data=f"admin_back_to_{current_category}")]
             ])
         )
+        return
 
     elif data.startswith("admin_back_to_"):
         category_key = data.split("_")[3]
         context.user_data['current_order_index'] = 0
-        show_single_order(update, context, category_key)
+        return show_single_order(update, context, category_key)
 
     elif data.startswith("show_my_order_"):
         order_id = data.split("_")[3]
-        show_my_active_order(update, context, order_id)
+        return show_my_active_order(update, context, order_id)
 
     elif data.startswith("next_"):
         parts = data.split("_")
@@ -281,7 +286,7 @@ def handle_admin_actions(update: Update, context: CallbackContext):
             category_key = parts[2]
             current_index = context.user_data.get('current_order_index', 0)
             context.user_data['current_order_index'] = current_index + 1
-            show_single_order(update, context, category_key)
+            return show_single_order(update, context, category_key)
 
     elif data.startswith("prev_"):
         parts = data.split("_")
@@ -289,7 +294,7 @@ def handle_admin_actions(update: Update, context: CallbackContext):
             category_key = parts[2]
             current_index = context.user_data.get('current_order_index', 0)
             context.user_data['current_order_index'] = current_index - 1
-            show_single_order(update, context, category_key)
+            return show_single_order(update, context, category_key)
 
     elif data.startswith("complete_"):
         order_id = data.split("_")[1]
@@ -298,6 +303,10 @@ def handle_admin_actions(update: Update, context: CallbackContext):
             f"✅ Заявка #{order_id} завершена!\n\n"
             "Теперь вы можете брать новые заявки через /admin"
         )
+        return
+
+    # Если действие не распознано
+    query.answer("Неизвестное действие")
 
 
 def complete_command(update: Update, context: CallbackContext):
@@ -373,7 +382,7 @@ def handle_category_selection(update: Update, context: CallbackContext):
 
 
 def handle_text_messages(update: Update, context: CallbackContext):
-    """Умный обработчик для всех текстовых сообщений"""
+    """Обработчик текстовых сообщений"""
     user_id = update.effective_user.id
     current_state = user_states.get(user_id, 'main')
     user_text = update.message.text
@@ -398,8 +407,17 @@ def handle_text_messages(update: Update, context: CallbackContext):
         description = context.user_data.get('description', 'Не указано')
         username = update.effective_user.username or update.effective_user.first_name
 
+        # СОХРАНЯЕМ ЗАЯВКУ В БАЗУ ДАННЫХ
         order_id = save_order(user_id, username, category, description, user_text)
+        print(f"✅ Заявка #{order_id} сохранена")
 
+        # ⭐⭐⭐ ОТПРАВЛЯЕМ УВЕДОМЛЕНИЯ МАСТЕРАМ ⭐⭐⭐
+        try:
+            notify_masters_new_order(context, order_id, category, description)
+        except Exception as e:
+            print(f"⚠️ Ошибка при отправке уведомлений: {e}")
+
+        # Формируем сообщение для пользователя
         order_text = (
             "✅ *Заявка создана!*\n\n"
             f"*Номер заявки:* #{order_id}\n"
@@ -412,8 +430,54 @@ def handle_text_messages(update: Update, context: CallbackContext):
         update.message.reply_text(order_text, parse_mode='Markdown')
         user_states[user_id] = 'main'
 
+        # Логируем создание заявки
+        print(f"\n🎉 НОВАЯ ЗАЯВКА #{order_id}")
+        print(f"👤 Пользователь: {username} (ID: {user_id})")
+        print(f"📦 Категория: {category}")
+        print(f"📝 Описание: {description}")
+        print(f"📞 Контакты: {user_text}")
+        print("📨 Уведомления отправлены мастерам")
+        print("=" * 50)
+
     else:
         update.message.reply_text("Нажмите /start чтобы создать новую заявку")
+
+
+def notify_masters_new_order(context, order_id, category, description):
+    """Уведомление мастеров о новой заявке"""
+    try:
+        # Обрезаем длинное описание
+        short_description = description[:100] + "..." if len(description) > 100 else description
+
+        message = (
+            "🎯 *НОВАЯ ЗАЯВКА!*\n\n"
+            f"*Заявка #*: {order_id}\n"
+            f"*Категория:* {category}\n"
+            f"*Описание:* {short_description}\n\n"
+            "➡️ Используйте /admin чтобы взять заявку в работу"
+        )
+
+        print(f"📨 Отправляем уведомления о заявке #{order_id}")
+
+        # Отправляем всем мастерам кроме самого себя (если он тоже мастер)
+        for master_id in ADMIN_IDS:
+            try:
+                # Не отправляем уведомление самому себе
+                if master_id != context.bot.id:
+                    context.bot.send_message(
+                        chat_id=master_id,
+                        text=message,
+                        parse_mode='Markdown'
+                    )
+                    print(f"✅ Уведомление отправлено мастеру {master_id}")
+                else:
+                    print(f"⏩ Пропускаем отправку самому себе ({master_id})")
+
+            except Exception as e:
+                print(f"❌ Ошибка отправки мастеру {master_id}: {e}")
+
+    except Exception as e:
+        print(f"❌ Критическая ошибка в уведомлениях: {e}")
 
 
 def show_my_active_order(update: Update, context: CallbackContext, order_id):
@@ -423,33 +487,55 @@ def show_my_active_order(update: Update, context: CallbackContext, order_id):
 
     order = get_order_by_id(order_id)
     if not order:
-        query.edit_message_text("Заявка не найдена.")
+        query.edit_message_text("❌ Заявка не найдена.")
         return
 
-    order_id, user_id, username, category, description, contacts, status, master_id, master_name, created_at = order
+    # Безопасное извлечение данных
+    order_data = {
+        'id': order[0],
+        'user_id': order[1],
+        'username': order[2],
+        'category': order[3],
+        'description': order[4],
+        'contacts': order[5],
+        'status': order[6],
+        'master_id': order[7],
+        'master_name': order[8],
+        'created_at': order[9]
+    }
 
+    # Убираем Markdown разметку для простоты
     order_text = (
-        "📋 *Ваша активная заявка*\n\n"
-        f"• *Заявка #*: {order_id}\n"
-        f"• *Категория:* {category}\n"
-        f"• *Клиент:* {username}\n"
-        f"• *Описание:* {description}\n"
-        f"• *Контакты:* {contacts}\n"
-        f"• *Принята:* {created_at}\n"
-        f"• *Статус:* В работе\n\n"
+        "📋 Ваша активная заявка\n\n"
+        f"• Заявка #: {order_data['id']}\n"
+        f"• Категория: {order_data['category']}\n"
+        f"• Клиент: @{order_data['username'] if order_data['username'] else 'без username'}\n"
+        f"• Описание: {order_data['description']}\n"
+        f"• Контакты: {order_data['contacts']}\n"
+        f"• Принята: {order_data['created_at']}\n"
+        f"• Статус: {order_data['status']}\n\n"
         "Выберите действие:"
     )
 
     keyboard = [
-        [InlineKeyboardButton("✅ Завершить заявку", callback_data=f"complete_{order_id}")],
+        [InlineKeyboardButton("✅ Завершить заявку", callback_data=f"complete_{order_data['id']}")],
         [InlineKeyboardButton("🔙 Назад", callback_data="admin_back")]
     ]
 
-    query.edit_message_text(
-        order_text,
-        reply_markup=InlineKeyboardMarkup(keyboard),
-        parse_mode='Markdown'
-    )
+    try:
+        # Убираем parse_mode='Markdown'
+        query.edit_message_text(
+            order_text,
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+    except Exception as e:
+        print(f"Ошибка при редактировании сообщения: {e}")
+        # Пробуем без разметки вообще
+        simple_text = f"Заявка #{order_data['id']} - {order_data['category']}\nКлиент: {order_data['contacts']}"
+        query.edit_message_text(
+            simple_text,
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
 
 
 def finance_command(update: Update, context: CallbackContext):
